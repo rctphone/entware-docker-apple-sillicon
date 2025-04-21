@@ -1,4 +1,4 @@
-# Building packages from Docker
+# Building packages from Docker optimized for Apple Sillicon
 
 A highly reproducible way to build Entware packages. A plesant way for Docker-addicted persons:)
 
@@ -6,8 +6,8 @@ A highly reproducible way to build Entware packages. A plesant way for Docker-ad
 
 Create Docker image tagged as `builder`:
 ```
-git clone https://github.com/Entware/docker.git
-docker build docker --pull --tag builder
+git clone https://github.com/rctphone/entware-docker-apple-sillicon.git
+docker build docker --pull
 ```
 
 Create Docker volume for compilation:
@@ -31,5 +31,3 @@ Extract compiled packages:
 ```
 docker cp builder:/home/me/Entware/bin .
 ```
-
-The `Start-Builder.ps1` (Start-Builder.sh) and `propagate_env.sh` scripts are very optional. It used by one of maintainers to dive into chosen arch-specific container from Windows (or Linux) and deploy some basic environment inside. It creates all necessary Docker volumes at first start, checks out Entware sources and prompts user for further compilation/development.
