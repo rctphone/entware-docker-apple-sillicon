@@ -1,5 +1,3 @@
-# https://github.com/openwrt/buildbot/blob/master/docker/buildworker/Dockerfile
-
 FROM	debian:11
 MAINTAINER	Entware team
 
@@ -12,8 +10,6 @@ RUN \
 	ccache \
 	curl \
 	gawk \
-	g++-multilib \
-	gcc-multilib \
 	genisoimage \
 	git-core \
 	gosu \
@@ -56,3 +52,21 @@ WORKDIR /home/me
 ENV HOME /home/me
 
 #ENTRYPOINT /bin/bash
+
+# ---------------- Entware toolchain build in distinct steps ----------------
+
+# 1. Clone Entware repository (shallow)
+RUN git clone --depth=1 https://github.com/Entware/Entware.git
+
+# 2. Switch context into the repo for subsequent commands
+WORKDIR /home/me/Entware
+
+# 3. Copy device‑specific config and generate package symlinks
+RUN cp configs/mipsel-3.4.config .config && \
+    make package/symlinks
+
+# 4. Fix PKG_HASH for go linux-arm64
+RUN sed -i 's/^PKG_HASH:=.*/PKG_HASH:=2096507509a98782850d1f0669786c09727053e9fe3c92b03c0d96f48700282b/' tools/go-bootstrap/Makefile
+
+# 5. Build the toolchain (parallel)
+RUN make toolchain/install -j$(nproc)
