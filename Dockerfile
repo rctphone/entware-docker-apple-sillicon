@@ -70,8 +70,25 @@ WORKDIR /home/me/Entware
 RUN cp configs/${ENTWARE_CONFIG} .config && \
     make package/symlinks
 
-# 4. Fix PKG_HASH for go linux-arm64
-RUN sed -i 's/^PKG_HASH:=.*/PKG_HASH:=2096507509a98782850d1f0669786c09727053e9fe3c92b03c0d96f48700282b/' tools/go-bootstrap/Makefile
+# 4. Fix PKG_HASH for tools/go-bootstrap - auto-detect arch and get SHA256 from .sha256 file
+RUN set -e; \
+  cd /home/me/Entware; \
+  GO_VER="$(sed -n 's/^PKG_VERSION:=[ \t]*//p' tools/go-bootstrap/Makefile)"; \
+  GO_VERSION_FULL="go${GO_VER}"; \
+  case "$(uname -m)" in \
+    aarch64) GO_ARCH="arm64" ;; \
+    x86_64)  GO_ARCH="amd64" ;; \
+    i?86)    GO_ARCH="386"   ;; \
+    *) echo "Unsupported arch: $(uname -m)"; exit 1 ;; \
+  esac; \
+  echo "Resolving SHA256 for ${GO_VERSION_FULL} linux/${GO_ARCH}..."; \
+  GO_FILENAME="${GO_VERSION_FULL}.linux-${GO_ARCH}.tar.gz"; \
+  SHA256_URL="https://dl.google.com/go/${GO_FILENAME}.sha256"; \
+  echo "Fetching SHA256 from: ${SHA256_URL}"; \
+  SHA256="$(curl -sL "${SHA256_URL}" | awk '{print $1}')"; \
+  test -n "$SHA256" || { echo "SHA256 not found at ${SHA256_URL}"; exit 1; }; \
+  sed -i "s/^PKG_HASH:=.*/PKG_HASH:=${SHA256}/" tools/go-bootstrap/Makefile; \
+  echo "Set PKG_HASH=${SHA256} for ${GO_FILENAME}"
 
-# 5. Build the toolchain (parallel)
-RUN make toolchain/install -j$(nproc)
+# 5. Build the toolchain
+RUN make toolchain/install -j$(nproc) 
