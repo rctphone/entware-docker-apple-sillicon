@@ -31,3 +31,19 @@ Extract compiled packages:
 ```
 docker cp builder:/home/me/Entware/bin .
 ```
+
+## Build architectures
+
+By default, the image builds the toolchain for arm64 (aarch64) using the `aarch64-3.10.config`.
+
+- Default (arm64):
+
+  ```
+  docker build . -t builder
+  ```
+
+- To build for a different architecture, provide the desired config via the `ENTWARE_CONFIG` build arg (see available configs in [`Entware/configs`](https://github.com/Entware/Entware/tree/master/configs)):
+
+  ```
+  docker build . -t builder --build-arg ENTWARE_CONFIG=mipsel-3.4.config
+  ```
