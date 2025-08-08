@@ -2,6 +2,7 @@ FROM	debian:11
 MAINTAINER	Entware team
 
 ARG	DEBIAN_FRONTEND=noninteractive
+ARG	ENTWARE_CONFIG=aarch64-3.10.config
 
 RUN \
     apt-get update && \
@@ -66,7 +67,7 @@ RUN git clone --depth=1 https://github.com/Entware/Entware.git
 WORKDIR /home/me/Entware
 
 # 3. Copy device‑specific config and generate package symlinks
-RUN cp configs/mipsel-3.4.config .config && \
+RUN cp configs/${ENTWARE_CONFIG} .config && \
     make package/symlinks
 
 # 4. Fix PKG_HASH for go linux-arm64
