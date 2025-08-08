@@ -8,6 +8,7 @@ RUN \
     apt-get install -y \
 	build-essential \
 	ccache \
+	clang \
 	curl \
 	gawk \
 	genisoimage \
@@ -16,14 +17,17 @@ RUN \
 	libdw-dev \
 	libelf-dev \
 	libncurses5-dev \
- 	libssl-dev \
+	libssl-dev \
 	locales \
 	mc \
 	pv \
 	pwgen \
 	python \
 	python3 \
+	python3-venv \
 	python3-pip \
+	python3-pyelftools \
+	python3-cryptography \
 	qemu-utils \
 	rsync \
 	signify-openbsd \
